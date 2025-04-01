@@ -2,6 +2,7 @@
 Small demo to illustrate how the plot function and the gridworld environment work
 """
 import numpy as np 
+import time 
 from gridworld import *
 from plot import *
 from config import G_UP, G_RIGHT, G_DOWN, G_LEFT
@@ -73,11 +74,19 @@ if __name__ == "__main__":
     #v_table = np.random.random((env.num_states()))
     #q_table = np.random.random((env.num_states(), env.num_actions()))
     #policy = np.random.random((env.num_states(), env.num_actions()))
-    v_table, policy = value_iteration(env, in_place=True)
-    q_table = derive_q_table(env, v_table)
+    ##v_table, policy = value_iteration(env, in_place=True)
+    ##q_table = derive_q_table(env, v_table)
     # either plot V-values and Q-values without the policy...
     # plot_v_table(env, v_table)
     # plot_q_table(env, q_table)
     # ...or with the policy
-    plot_v_table(env, v_table, policy)
-    plot_q_table(env, q_table, policy)
+    ##plot_v_table(env, v_table, policy)
+    ##plot_q_table(env, q_table, policy)
+    
+    start = time.time()
+    v, p = value_iteration(env, in_place=True)
+    print("In-place took:", time.time() - start)
+
+    start = time.time()
+    v2, p2 = value_iteration(env, in_place=False)
+    print("Non-in-place took:", time.time() - start)
