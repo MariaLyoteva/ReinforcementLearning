@@ -54,6 +54,51 @@ def value_iteration(env, gamma=0.7, theta=1e-4, in_place=True):
 
     return v_table, policy
 
+def policy_iteration(env, gamma=0.99, theta=1e-4):
+    num_states = env.num_states()
+    num_actions = env.num_actions()
+
+    # Initialize policy randomly (uniformly)
+    policy = np.ones((num_states, num_actions)) / num_actions
+    v_table = np.zeros(num_states)
+
+    while True:
+        # --- Policy Evaluation ---
+        while True:
+            delta = 0
+            for s in range(num_states):
+                v = 0
+                for a in range(num_actions):
+                    s_next, reward, done = env.step_dp(s, a)
+                    v += policy[s][a] * (reward + gamma * v_table[s_next] * (not done))
+                delta = max(delta, abs(v - v_table[s]))
+                v_table[s] = v
+            if delta < theta:
+                break
+
+        # --- Policy Improvement ---
+        stable = True
+        for s in range(num_states):
+            old_action = np.argmax(policy[s])
+            q_values = []
+            for a in range(num_actions):
+                s_next, reward, done = env.step_dp(s, a)
+                q = reward + gamma * v_table[s_next] * (not done)
+                q_values.append(q)
+
+            best_action = np.argmax(q_values)
+            policy[s] = np.eye(num_actions)[best_action]
+
+            if best_action != old_action:
+                stable = False
+
+        if stable:
+            break
+
+    return v_table, policy
+
+
+
 def derive_q_table(env, v_table, gamma=0.7):
     num_states = env.num_states()
     num_actions = env.num_actions()
@@ -84,9 +129,10 @@ if __name__ == "__main__":
     ##plot_q_table(env, q_table, policy)
     
     start = time.time()
-    v, p = value_iteration(env, in_place=True)
-    print("In-place took:", time.time() - start)
+    #v, p = value_iteration(env, in_place=True)
+    v_pi, pi_pi = policy_iteration(env)
+    print("Policy:", time.time() - start)
 
     start = time.time()
-    v2, p2 = value_iteration(env, in_place=False)
-    print("Non-in-place took:", time.time() - start)
+    v2, p2 = value_iteration(env, in_place=True)
+    print("Value in-place took:", time.time() - start)
