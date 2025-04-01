@@ -388,6 +388,17 @@ class Random(GridworldEnv):
 
         return ValueError("No start found")
 
+class CustomWorld(GridworldEnv):
+    def __init__(self):
+        self.step_cost = -1
+        self.g_reward = 50
+        self.o_reward = -100
+        self.grid = [
+            ['S', ' ', ' ', '#', 'G'],
+            [' ', 'O', ' ', '#', ' '],
+            [' ', ' ', ' ', ' ', ' ']
+        ]
+        GridworldEnv.__init__(self)
 
 if __name__ == "__main__":
     r = Test()
